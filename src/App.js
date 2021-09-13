@@ -6,7 +6,9 @@ import axios from 'axios'
 function App() {
 
   const [state, setState] = useState({
-    joke: ''
+    joke: '',
+    searchKeyword: '',
+    searchUrl: `https://api.chucknorris.io/jokes/search?query=`
   })
 
   useEffect( () => {
@@ -15,12 +17,28 @@ function App() {
 
   const fetchData = async () => {
     const result = await axios.get('https://api.chucknorris.io/jokes/random')
-    console.log(result.data.value)
     setState({
       ...state,
       joke: result.data.value
     })
-    console.log('this is state-->', state)
+  }
+
+  const searchJoke = (e) => {
+    setState({
+      ...state,
+      searchKeyword: e.target.value
+    })
+  }
+
+  const fetchMyJoke = async () => {
+    const result = await axios.get(state.searchUrl + state.searchKeyword)
+    
+    const jokePosition = Math.floor(Math.random()*result.data.result.length)
+
+    setState({
+      ...state,
+      joke: result.data.result[jokePosition].value
+    })
   }
 
   return (
@@ -37,22 +55,22 @@ function App() {
           <span>Search for a word</span>
         </div>
         <div className="card-body">
-          <input type="text" />
+          <input type="text" onChange={searchJoke} />
         </div>
       </div> 
 
       <div>
-        <button className="btn btn-warning btn-lg">Generate Joke</button>
+        <button onClick={fetchMyJoke} className="btn btn-warning btn-lg">Generate Joke</button>
       </div>
 
     </div>
 
     </div>
 
-    <h2 className="subtitle"> Here is the joke</h2>
+    <h2 className="subtitle">Joke</h2>
     <h4>{state.joke}</h4>
   </div>
-  );
+  )
 }
 
 export default App;
